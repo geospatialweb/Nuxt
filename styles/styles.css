@@ -1,0 +1,9 @@
+@import url(http://fonts.googleapis.com/css?family=Orbitron:700);
+@import url(http://fonts.googleapis.com/css?family=Roboto:300);
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #000;
+}
