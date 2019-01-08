@@ -1,0 +1,268 @@
+{
+	"header": {
+		"company": {
+			"name": "Geospatial Web"
+		},
+		"logo": {
+			"src": "./logo.png"
+		},
+		"repo": {
+			"name": "GitHub Repository",
+			"src": "https://github.com/geospatialweb/Nuxt.git"
+		},
+		"title": {
+			"name" : "Node | Express | Vue | Nuxt | Vuex | Mapbox GL | Deck.GL | PostGIS | Docker"
+		}
+	},
+	"heatmap": {
+		"active": false,
+		"colour_range": [
+			[1, 152, 189],
+			[73, 227, 206],
+			[216, 254, 181],
+			[254, 237, 177],
+			[254, 173, 84],
+			[209, 55, 78]
+		],
+		"coverage": "1.0",
+		"data_url": "https://raw.githubusercontent.com/uber-common/deck.gl-data/master/examples/3d-heatmap/heatmap-data.csv",
+		"elevationRange": [0, 1000],
+		"elevationScale": 250,
+		"extruded": true,
+		"id": "heatmap",
+		"light_settings": {
+			"ambientRatio": 0.4,
+			"diffuseRatio": 0.6,
+			"lightsPosition": [-0.144528, 49.739968, 8000, -3.807751, 54.104682, 8000],
+			"lightsStrength": [0.8, 0.0, 0.8, 0.0],
+			"numberOfLights": 2,
+			"specularRatio": 0.2
+		},
+		"opacity": 1,
+		"params": ["coverage", "radius", "upperPercentile"],
+		"radius": "1000",
+		"settings": {
+			"bearing": -30,
+			"center": [-2.0, 52.0],
+			"pitch": 50,
+			"zoom": 6.5
+		},
+		"upperPercentile": "100"
+	},
+	"hillshade": {
+		"id": "hillshading",
+		"index": "waterway-river-canal-shadow",
+		"layer": {
+			"type": "raster-dem",
+			"url": "mapbox://mapbox.terrain-rgb"
+		},
+		"source": "dem",
+		"type": "hillshade"
+	},
+	"layerStyles": {
+		"biosphere": {
+			"fields": "name, description, ST_AsGeoJSON(geom)",
+			"layer": {
+				"id": "biosphere",
+				"active": true,
+				"type": "fill",
+				"source": {
+					"type": "geojson"
+				},
+				"layout": {
+					"visibility": "visible"
+				},
+				"paint": {
+					"fill-color": "#090",
+					"fill-opacity": 0.3,
+					"fill-outline-color": "#000"
+				}
+			}
+		},
+		"trails": {
+			"fields": "name, description, lat, lng, ST_AsGeoJSON(geom)",
+			"layer": {
+				"id": "trails",
+				"active": false,
+				"type": "line",
+				"source": {
+					"type": "geojson"
+				},
+				"layout": {
+					"visibility": "none"
+				},
+				"paint": {
+					"line-color": "#900",
+					"line-width": 2
+				}
+			}
+		}
+	},
+	"layers": [
+		{
+			"name": "Satellite",
+			"active": false,
+			"class": "satellite",
+			"icon": "satellite-icon",
+			"src": "./satellite.png",
+			"height": "20",
+			"width": "20"
+		},
+		{
+			"name": "Biosphere",
+			"active": true,
+			"class": "biosphere",
+			"icon": "biosphere-icon",
+			"src": "./biosphere.png",
+			"height": "16",
+			"width": "16"
+		},
+		{
+			"name": "Office",
+			"active": false,
+			"class": "office",
+			"icon": "office-icon",
+			"src": "./office.png",
+			"height": "20",
+			"width": "18"
+		},
+		{
+			"name": "Places",
+			"active": false,
+			"class": "places",
+			"icon": "places-icon",
+			"src": "./places.png",
+			"height": "20",
+			"width": "18"
+		},
+		{
+			"name": "Trails",
+			"active": false,
+			"class": "trails",
+			"icon": "trails-icon",
+			"src": "./trails.png",
+			"height": "20",
+			"width": "18"
+		},
+		{
+			"name": "Deck GL",
+			"active": false,
+			"class": "heatmap",
+			"icon": "uber-icon",
+			"src": "./uber.png",
+			"height": "18",
+			"width": "18"
+		}
+	],
+	"map": {
+		"accessToken": "pk.eyJ1IjoiZ2Vvc3BhdGlhbHdlYiIsImEiOiJ6WGdOUFRvIn0.GoVRwZq5EfVsLNGyCqgZTw",
+		"controls": {
+			"navigationControl": {
+				"position": "top-left"
+			}
+		},
+		"options": {
+			"center": [-76.3, 44.45],
+			"container": "map",
+			"minZoom": 2,
+			"maxZoom": 15,
+			"zoom": 9
+		},
+		"settings": {
+			"bearing": -0,
+			"bounds": {
+				"_ne": {
+					"lat": null,
+					"lng": null
+				},
+				"_sw": {
+					"lat": null,
+					"lng": null
+				}
+			},
+			"center": [-76.3, 44.45],
+			"pitch": 0,
+			"zoom": 9
+		},
+		"styles": {
+			"outdoors": {
+				"name": "outdoors",
+				"active": true,
+				"type": "vector",
+				"url": "mapbox://styles/mapbox/cjaudgl840gn32rnrepcb9b9g"
+			},
+			"satellite": {
+				"name": "satellite",
+				"active": false,
+				"type": "vector",
+				"url": "mapbox://styles/mapbox/satellite-v9"
+			}
+		}
+	},
+	"markers": {
+		"office": {
+			"name": "office",
+			"active": false,
+			"fields": "name, description, ST_AsGeoJSON(geom)",
+			"hidden": false
+		},
+		"places": {
+			"name": "places",
+			"active": false,
+			"fields": "name, description, ST_AsGeoJSON(geom)",
+			"hidden": false
+		},
+		"trails": {
+			"name": "trails",
+			"active": false,
+			"fields": "name, description, lat, lng, ST_AsGeoJSON(geom)",
+			"hidden": false
+		}
+	},
+	"splashScreen": {
+		"active": true,
+		"class": "splashScreen"
+	},
+	"trails": [
+		{
+			"name": "Select Trail",
+			"active": false
+		},
+		{
+			"name": "Blue Mountain",
+			"active": false,
+			"center": [-76.04, 44.508],
+			"zoom": 11
+		},
+		{
+			"name": "Charleston Lake",
+			"active": false,
+			"center": [-76.04, 44.508],
+			"zoom": 11
+		},
+		{
+			"name": "Lemoine Point",
+			"active": false,
+			"center": [-76.61, 44.223],
+			"zoom": 13
+		},
+		{
+			"name": "Lyn Valley",
+			"active": false,
+			"center": [-75.75, 44.575],
+			"zoom": 11
+		},
+		{
+			"name": "Mac Johnson",
+			"active": false,
+			"center": [-75.75, 44.575],
+			"zoom": 11
+		},
+		{
+			"name": "Seeley\"s Bay",
+			"active": false,
+			"center": [-76.22, 44.485],
+			"zoom": 11
+		}
+	]
+}

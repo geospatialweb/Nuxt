@@ -18,8 +18,8 @@ module.exports = {
 	rules: {
 		indent: ['error', 'tab'],
 		'linebreak-style': ['error', 'windows'],
-		'no-console': 'off',
-		'no-debugger': 'off',
+		'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    	'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
 		'no-param-reassign': ['error', { props: false }],
 		'no-shadow': ['error', { allow: ['state'] }],
 		'no-tabs': ['error', { allowIndentationTabs: true }],

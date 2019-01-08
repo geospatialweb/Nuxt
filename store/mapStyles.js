@@ -1,39 +1,36 @@
-import config from '../config/client';
-import events from '../events';
+import config from '../config/client/config.json';
+import ee from '../events';
 
 const state = () => ({
 	mapStyles: config.map.styles,
 });
 
 const mutations = {
-	SET_MAP_STYLE(state, name) {
+	setActive(state, name) {
 		state.mapStyles[name].active = !state.mapStyles[name].active;
 	},
 };
 
 const actions = {
-	getMapStyle() {
-		const mapStyle = Object.keys(state.mapStyles).find(key => state.mapStyles[key].active);
-		events.mapStyles.mapStyle.emit('mapStyle', state.mapStyles[mapStyle]);
+	getStyle() {
+		const mapStyle = Object.keys(this.state.mapStyles.mapStyles)
+			.find(key => this.state.mapStyles.mapStyles[key].active);
+		ee.emit('mapStyleActive', this.state.mapStyles.mapStyles[mapStyle]);
 	},
-	setMapStyle({ commit }, name) {
-		commit('SET_MAP_STYLE', name);
-
+	setStyle({ commit }, name) {
+		commit('setActive', name);
 		let mapStyleName;
-
-		name === state.mapStyles.outdoors.name ?
-			mapStyleName = state.mapStyles.satellite.name :
-			mapStyleName = state.mapStyles.outdoors.name;
-
-		commit('SET_MAP_STYLE', mapStyleName);
+		name === this.state.mapStyles.mapStyles.outdoors.name ?
+			mapStyleName = this.state.mapStyles.mapStyles.satellite.name :
+			mapStyleName = this.state.mapStyles.mapStyles.outdoors.name;
+		commit('setActive', mapStyleName);
 	},
 };
 
-const mapStylesModule = {
-	namespaced: true,
-	state,
+const mapStyles = {
 	actions,
 	mutations,
+	state,
 };
 
-export default mapStylesModule;
+export default mapStyles;

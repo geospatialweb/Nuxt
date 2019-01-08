@@ -1,9 +1,11 @@
-import events from '../events';
+import ee from '../events';
+import heatmapService from './heatmap';
 
 export default {
-	getData() {
-		events.trails.getTrails.emit('getTrails');
-		events.markers.getMarkers.emit('getMarkers');
-		events.layerStyles.getLayerStyles.emit('getLayerStyles');
+	loadData() {
+		heatmapService.loadHeatmap();
+		ee.emit('loadTrails');
+		ee.emit('loadMarkers');
+		ee.emit('loadLayerStyles');
 	},
 };

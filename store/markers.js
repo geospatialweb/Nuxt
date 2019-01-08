@@ -1,6 +1,6 @@
-// import { Axios } from 'axios-observable';
-// import config from '../config/client';
-// import events from '../events';
+import { Axios } from 'axios-observable';
+import config from '../config/client/config.json';
+import ee from '../events';
 
 const state = () => ({
 	markers: [],
@@ -8,47 +8,75 @@ const state = () => ({
 });
 
 const mutations = {
-	CREATE_MARKERS_HASH(state) {
+	createMarkersHash(state) {
 		state.markers.map((marker, i) => {
 			const name = marker[0].getElement().classList[0].replace('-marker', '');
-
 			state.markersHash[name] = i;
 			return true;
 		});
 	},
-	LOAD_MARKER(state, marker) {
+	loadMarker(state, marker) {
 		state.markers.push(marker);
 	},
-	SET_MARKER_ACTIVE(state, marker) {
-		marker.active = !marker.active;
+	setActive(state, name) {
+		state.markers[state.markersHash[name]].active = !state.markers[state.markersHash[name]].active;
 	},
-	SET_MARKER_HIDDEN(state, marker) {
-		marker.hidden = !marker.hidden;
+	setHidden(state, name) {
+		state.markers[state.markersHash[name]].hidden = !state.markers[state.markersHash[name]].hidden;
 	},
 };
 
 const actions = {
-	getMarkers() {
+	loadMarkers({ commit }) {
+		const { markers } = config;
+
+		Object.keys(markers).map((key) => {
+			const params = {
+				fields: markers[key].fields,
+				table: markers[key].name,
+			};
+
+			const subscription = Axios.get('/api/geojson', { params })
+				.subscribe((res) => {
+					res.data ?
+						ee.emit('setMarker', markers[key], res.data) :
+						console.error('Data Error:\n', res.data);
+				},
+				(err) => {
+					console.error('Query Failed:\n', err.error);
+				},
+				() => {
+					if (this.state.markers.markers.length === Object.keys(markers).length) {
+						commit('createMarkersHash');
+						actions.setMarkers(this.state.markers.markers, this.state.markers.markersHash);
+					}
+					subscription.unsubscribe();
+				});
+			return true;
+		});
 	},
 
 	loadMarker({ commit }, marker) {
-		commit('LOAD_MARKER', marker);
+		commit('loadMarker', marker);
 	},
 
-	setMarkerActive({ commit }, marker) {
-		commit('SET_MARKER_ACTIVE', marker);
+	setActive({ commit }, name) {
+		commit('setActive', name);
 	},
 
-	setMarkerHidden({ commit }, marker) {
-		commit('SET_MARKER_HIDDEN', marker);
+	setHidden({ commit }, name) {
+		commit('setHidden', name);
+	},
+
+	setMarkers(markers, markersHash) {
+		ee.emit('setMarkers', markers, markersHash);
 	},
 };
 
-const markersModule = {
-	namespaced: true,
-	state,
-	mutations,
+const markers = {
 	actions,
+	mutations,
+	state,
 };
 
-export default markersModule;
+export default markers;

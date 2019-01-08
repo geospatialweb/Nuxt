@@ -1,25 +1,22 @@
-import events from '../events';
+import ee from '../events';
 import mapService from './map';
-import trails from '../store/trails';
 
 export default {
-	selectTrail(event) {
+	selectTrail(event, trails) {
 		event.stopPropagation();
-
 		const trail = event.target.value;
-		const i = trails.state.trails.findIndex(obj => obj.name === trail);
-
+		const i = trails.findIndex(obj => obj.name === trail);
 		/* exclude 'Select Trail' */
 		if (i > 0) {
-			events.trails.setTrailActive.emit('setTrailActive', i);
-			this.setTrail(trail);
+			ee.emit('setTrailActive', i);
+			this.setTrail(trails, i);
 		}
 	},
-	/* pan and zoom to selected trail */
-	setTrail(trail) {
+
+	setTrail(trails, i) {
 		mapService.map.flyTo({
-			center: trails.state.trails[trails.state.trailsHash[trail]].center,
-			zoom: trails.state.trails[trails.state.trailsHash[trail]].zoom,
+			center: trails[i].center,
+			zoom: trails[i].zoom,
 		});
 	},
 };

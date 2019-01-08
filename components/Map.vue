@@ -1,27 +1,30 @@
 <template>
 	<div class='mapContainer'>
 		<div :id='container'></div>
-		<!-- <SplashScreen /> -->
-		<!-- <Layers /> -->
-		<!-- <Trails /> -->
+		<SplashScreen />
+		<Heatmap />
+		<Layers />
+		<Trails />
 	</div>
 </template>
 
 <script>
-// import Layers from './Layers.vue';
-import config from '../config/client';
+import Heatmap from './Heatmap.vue';
+import Layers from './Layers.vue';
+import SplashScreen from './SplashScreen.vue';
+import Trails from './Trails.vue';
+import config from '../config/client/config.json';
 
 export default {
 	name: 'Map',
-	data() {
-		return {
-			container: config.map.options.container,
-		};
-	},
+	data: () => ({
+		container: config.map.options.container,
+	}),
 	components: {
-		// Layers,
-		// SplashScreen,
-		// Trails,
+		Heatmap,
+		Layers,
+		SplashScreen,
+		Trails,
 	},
 };
 </script>

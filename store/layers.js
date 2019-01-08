@@ -1,37 +1,35 @@
-import config from '../config/client';
-import events from '../events';
+import config from '../config/client/config.json';
+import ee from '../events';
 
 const state = () => ({
 	layers: config.layers,
 });
 
 const mutations = {
-	SET_LAYER_ACTIVE(state, i) {
+	setActive(state, i) {
 		state.layers[i].active = !state.layers[i].active;
 	},
 };
 
 const actions = {
 	selectLayer(context, event) {
-		events.layers.selectLayer.emit('selectLayer', event);
+		ee.emit('selectLayer', event, context.state.layers);
 	},
 
-	setLayerActive({ commit }, i) {
-		commit('SET_LAYER_ACTIVE', i);
+	setActive({ commit }, i) {
+		commit('setActive', i);
 	},
 };
 
 const getters = {
-	icons: state => state.layers.filter(layer => layer.icon),
 	layers: state => state.layers,
 };
 
-const layersModule = {
-	namespaced: true,
-	state,
+const layers = {
 	actions,
 	getters,
 	mutations,
+	state,
 };
 
-export default layersModule;
+export default layers;

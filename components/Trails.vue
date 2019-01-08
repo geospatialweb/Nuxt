@@ -1,16 +1,20 @@
 <template>
-	<select class='selectTrail' @change='selectTrail'>
+	<select class='trails' :disabled='disabled' @change='selectTrail'>
 		<option v-for='trail in trails' :key='trail.name'>{{ trail.name }}</option>
 	</select>
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'nuxt';
+/* eslint-disable-next-line import/no-extraneous-dependencies */
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
 	name: 'Trails',
 	computed: {
-		...mapGetters({ trails: 'trails/trails' }),
+		...mapGetters({
+			disabled: 'trails/disabled',
+			trails: 'trails/trails',
+		}),
 	},
 	methods: {
 		...mapActions({ selectTrail: 'trails/selectTrail' }),
@@ -19,12 +23,12 @@ export default {
 </script>
 
 <style lang='scss' scoped>
-select.selectTrail {
+select.trails {
 	position: absolute;
-	border-style: none;
+	border-style: solid;
 	font-family: 'Roboto', sans-serif;
 	left: 10px;
-	top: 310px;
-	width: 110px;
+	top: 320px;
+	width: 126px;
 }
 </style>

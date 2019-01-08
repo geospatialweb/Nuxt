@@ -1,49 +1,40 @@
-import map from './map';
-import events from '../events';
-import markers from '../store/markers';
+import ee from '../events';
+import mapService from './map';
+import markersService from './markers';
 
 export default {
-	addMarkers(layer) {
-		markers.state.markers[markers.state.markersHash[layer]]
-			.map((marker) => {
-				events.markers.setMarkerActive.emit('setMarkerActive', marker);
-				marker.addTo(map.map);
-				return true;
-			});
+	addMarkers(name) {
+		ee.emit('setMarkersActive', name);
+		markersService.markers[markersService.markersHash[name]]
+			.map(marker => marker.addTo(mapService.map));
 	},
 
-	removeMarkers(layer) {
-		markers.state.markers[markers.state.markersHash[layer]]
-			.map((marker) => {
-				events.markers.setMarkerActive.emit('setMarkerActive', marker);
-				marker.remove();
-				return true;
-			});
+	removeMarkers(name) {
+		ee.emit('setMarkersActive', name);
+		markersService.markers[markersService.markersHash[name]]
+			.map(marker => marker.remove());
 	},
 
 	hideMarkers() {
-		markers.state.markers.map((marker) => {
+		markersService.markers.map((marker) => {
 			const name = marker[0].getElement().classList[0].replace('-marker', '');
 			const el = document.querySelector(`div.${name}-marker`);
 
 			if (el) {
-				events.markers.setMarkerHidden.emit('setMarkerHidden', marker);
+				ee.emit('setMarkersHidden', name);
 				this.removeMarkers(name);
 			}
-
 			return true;
 		});
 	},
 
 	showMarkers() {
-		markers.state.markers.map((marker) => {
+		markersService.markers.map((marker) => {
 			if (marker.hidden) {
 				const name = marker[0].getElement().classList[0].replace('-marker', '');
-
-				events.markers.setMarkerHidden.emit('setMarkerHidden', marker);
+				ee.emit('setMarkersHidden', name);
 				this.addMarkers(name);
 			}
-
 			return true;
 		});
 	},

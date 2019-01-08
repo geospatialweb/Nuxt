@@ -1,59 +1,58 @@
-import config from '../config/client';
-import events from '../events';
+import config from '../config/client/config.json';
+import ee from '../events';
 
 const state = () => ({
+	disabled: false,
 	trails: [],
-	trailsHash: {},
 });
 
 const mutations = {
-	CREATE_TRAILS_HASH(state) {
-		state.trails
-			.filter((trail, i) => i > 0)
-			.map((trail, i) => {
-				state.trailsHash[trail.name] = i + 1;
-				return true;
-			});
-	},
-	LOAD_TRAILS(state, trails) {
+	loadTrails(state, trails) {
 		trails.map(trail => state.trails.push(trail));
 	},
-	SET_TRAIL_ACTIVE(state, idx) {
+	setActive(state, idx) {
 		state.trails.map((trail, i) => {
 			i === idx ?
 				state.trails[i].active = true :
 				state.trails[i].active = false;
-
 			return true;
 		});
+	},
+
+	setDisabled(state) {
+		state.disabled = !state.disabled;
 	},
 };
 
 const actions = {
-	getTrails({ commit }) {
-		commit('LOAD_TRAILS', config.trails);
-		commit('CREATE_TRAILS_HASH');
+	loadTrails({ commit }) {
+		commit('loadTrails', config.trails);
 	},
 
 	selectTrail(context, event) {
-		events.trails.selectTrail.emit('selectTrail', event);
+		ee.emit('selectTrail', event, context.state.trails);
 	},
 
-	setTrailActive({ commit }, i) {
-		commit('SET_TRAIL_ACTIVE', i);
+	setActive({ commit }, i) {
+		commit('setActive', i);
+	},
+
+	setDisabled({ commit }) {
+		commit('setDisabled');
 	},
 };
 
 const getters = {
+	disabled: state => state.disabled,
 	trails: state => state.trails,
 };
 
+
 const trailsModule = {
-	namespaced: true,
-	state,
-	mutations,
 	actions,
 	getters,
+	mutations,
+	state,
 };
 
 export default trailsModule;

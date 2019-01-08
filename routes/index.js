@@ -13,7 +13,7 @@ module.exports = router.get('/', (req, res) => {
 
 	const pool = new Pool({
 		/* local instance process.env.DATABASE_URL_LOCAL */
-		connectionString: process.env.DATABASE_URL_LOCAL,
+		connectionString: process.env.DATABASE_URL,
 	})
 		.on('error', (err) => {
 			console.error('Connection Failed:\n', err);
@@ -26,12 +26,10 @@ module.exports = router.get('/', (req, res) => {
 		} else if (rows.rowCount > 0) {
 			const geojson = rows.rows[0].row_to_json;
 			delete geojson.features[0].properties.st_asgeojson;
-
 			res.status(200).send(geojson);
 		} else {
 			console.error('No rows found:\n', query);
 		}
-
 		pool.end();
 	});
 });

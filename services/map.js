@@ -1,49 +1,52 @@
 import mapboxgl from 'mapbox-gl';
-import config from '../config/client';
-import events from '../events';
-// import dataService from './data';
-// import layerStyles from '../store/layerStyles';
-// import layers from '../store/layers';
-// import mapSettings from '../store/mapSettings';
-// import mapStyles from '../store/mapStyles';
-// import markers from '../store/markers';
-// import splashScreen from '../store/splashScreen';
+import config from '../config/client/config.json';
+import dataService from './data';
+import ee from '../events';
+import heatmapService from './heatmap';
+import layersService from './layers';
+import layerStylesService from './layerStyles';
+import markerDisplayService from './markerDisplay';
+import markersService from './markers';
+import splashScreenService from './splashScreen';
 
 export default {
 	accessToken: config.map.accessToken,
+	heatmapSettings: config.heatmap.settings,
 	hillshade: config.hillshade,
-	layerStyles: config.layerStyles,
+	layers: config.layers,
 	mapControls: config.map.controls,
 	mapOptions: {
 		center: config.map.options.center,
 		container: config.map.options.container,
 		style: config.map.styles.outdoors.url,
+		minZoom: config.map.options.minZoom,
+		maxZoom: config.map.options.maxZoom,
 		zoom: config.map.options.zoom,
 	},
+	mapSettings: config.map.settings,
 	mapStyle: config.map.styles.outdoors,
-	markers: config.markers,
+	mapStyles: config.map.styles,
 
 	/* instantiate map instance */
 	loadMap() {
 		mapboxgl.accessToken = this.accessToken;
-
 		this.map = new mapboxgl.Map(this.mapOptions)
 			.addControl(new mapboxgl.NavigationControl(), this.mapControls.navigationControl.position)
-			/* once layer styles and markers loaded, hide splash screen */
-			/* eslint-disable no-tabs */
-			// .on('data', () => {
-			// 	if (layerStyles.state.layerStyles.length === Object.keys(this.layerStyles).length &&
-			// 			markers.state.markers.length === Object.keys(this.markers).length &&
-			// 			splashScreen.state.splashScreen.active) {
-			// 		events.splashScreen.hideSplashScreen.emit('hideSplashScreen');
-			// 	}
-			// })
 			.on('load', () => {
 				this.addHillShading();
-				// dataService.getData();
+				dataService.loadData();
 			})
 			.on('render', () => {
-				// this.setMapSettings();
+				ee.emit('getMapSettings');
+				this.setMapSettings();
+			})
+			/* once layer styles and markers loaded, hide splash screen */
+			.on('styledata', () => {
+				if (layerStylesService.layerStyles.length === Object.keys(config.layerStyles).length &&
+					markersService.markers.length === Object.keys(config.markers).length &&
+					splashScreenService.splashScreen.active) {
+					splashScreenService.hideSplashScreen();
+				}
 			});
 	},
 
@@ -58,57 +61,149 @@ export default {
 		}
 
 		this.map.addLayer(layerStyle, index);
+
+		if (heatmapService.heatmap && !heatmapService.heatmap.props.active &&
+				layerStyle.id === heatmapService.heatmap.id) {
+			this.map.setLayoutProperty(layerStyle.id, 'visibility', 'none');
+		}
 	},
 
-	getMapStyle() {
-		events.mapStyles.setMapStyle.emit('setMapStyle', this.mapStyle.name);
-		events.mapStyles.getMapStyle.emit('getMapStyle');
+	displayHeatmap() {
+		const i = this.layers.findIndex(obj => obj.class === this.mapStyles.satellite.name);
+		heatmapService.heatmap.props.active ?
+			this.showHeatmap(i) :
+			this.hideHeatmap(i);
 	},
 
-	setLayerStyleVisibility() {
-		// const layer = layers.state.layers[i];
+	showHeatmap(i) {
+		ee.emit('setTrailsDisabled');
+		ee.emit('getMapSettings');
 
-		// layer.active ?
-		// 	this.map.setLayoutProperty(layer.class, 'visibility', 'visible') :
-		// 	this.map.setLayoutProperty(layer.class, 'visibility', 'none');
+		this.map.bearing = this.mapSettings.bearing;
+		this.map.center = this.mapSettings.center;
+		this.map.pitch = this.mapSettings.pitch;
+		this.map.mapStyle = this.mapStyle;
+		this.map.zoom = this.mapSettings.zoom;
+
+		this.map.setBearing(this.heatmapSettings.bearing);
+		this.map.setCenter(this.heatmapSettings.center);
+		this.map.setPitch(this.heatmapSettings.pitch);
+		this.map.setZoom(this.heatmapSettings.zoom);
+
+		if (this.mapStyle.name === this.mapStyles.outdoors.name) {
+			ee.emit('setLayerActive', i);
+			layersService.setLayer(this.layers[i].class, i);
+		} else {
+			this.map.setLayoutProperty(heatmapService.heatmap.id, 'visibility', 'visible');
+		}
+	},
+
+	hideHeatmap(i) {
+		ee.emit('setTrailsDisabled');
+		heatmapService.reInitializeHeatmapParams();
+
+		this.map.setBearing(this.map.bearing);
+		this.map.setCenter(this.map.center);
+		this.map.setLayoutProperty(heatmapService.heatmap.id, 'visibility', 'none');
+		this.map.setPitch(this.map.pitch);
+		this.map.setZoom(this.map.zoom);
+
+		layerStylesService.layerStyles.map((layerStyle) => {
+			if (layerStyle.layout.visibility === 'visible') {
+				this.map.setLayoutProperty(layerStyle.id, 'visibility', 'none');
+			}
+			return true;
+		});
+
+		if (this.mapStyle.name !== this.map.mapStyle.name) {
+			ee.emit('setLayerActive', i);
+			layersService.setLayer(this.layers[i].class, i);
+		} else if (this.map.mapStyle.name === this.mapStyles.outdoors.name) {
+			markerDisplayService.hideMarkers();
+			setTimeout(() => {
+				layerStylesService.layerStyles.map((layerStyle) => {
+					if (layerStyle.layout.visibility === 'visible') {
+						this.map.setLayoutProperty(layerStyle.id, 'visibility', 'visible');
+					}
+					return true;
+				});
+				markerDisplayService.showMarkers();
+			}, 1200);
+		} else if (this.map.mapStyle.name === this.mapStyles.satellite.name) {
+			layerStylesService.layerStyles.map((layerStyle) => {
+				if (layerStyle.layout.visibility === 'visible') {
+					this.map.setLayoutProperty(layerStyle.id, 'visibility', 'visible');
+				}
+				return true;
+			});
+		}
+	},
+
+	setLayerStyleVisibility(layer) {
+		layer.active ?
+			this.map.setLayoutProperty(layer.class, 'visibility', 'visible') :
+			this.map.setLayoutProperty(layer.class, 'visibility', 'none');
+	},
+
+	getMapSettings(settings) {
+		this.mapSettings = settings;
 	},
 
 	setMapSettings() {
-		// const settings = {
-		// 	bearing: this.map.getBearing(),
-		// 	bounds: this.map.getBounds(),
-		// 	center: this.map.getCenter(),
-		// 	pitch: this.map.getPitch(),
-		// 	zoom: this.map.getZoom(),
-		// };
+		const settings = {
+			bearing: this.map.getBearing(),
+			bounds: this.map.getBounds(),
+			center: this.map.getCenter(),
+			pitch: this.map.getPitch(),
+			zoom: this.map.getZoom(),
+		};
 
-		// if (settings.bounds._ne.lat !== mapSettings.default.state.mapSettings.bounds._ne.lat ||
-		// 	settings.bounds._ne.lng !== mapSettings.default.state.mapSettings.bounds._ne.lng ||
-		// 	settings.bounds._sw.lat !== mapSettings.defaultstate.mapSettings.bounds._sw.lat ||
-		// 	settings.bounds._sw.lng !== mapSettings.default.state.mapSettings.bounds._sw.lng) {
-		// 	events.mapSettings.setMapSettings.emit('setMapSettings', settings);
-		// }
+		if (settings.bounds._ne.lat !== this.mapSettings.bounds._ne.lat ||
+			settings.bounds._ne.lng !== this.mapSettings.bounds._ne.lng ||
+			settings.bounds._sw.lat !== this.mapSettings.bounds._sw.lat ||
+			settings.bounds._sw.lng !== this.mapSettings.bounds._sw.lng) {
+			ee.emit('setMapSettings', settings);
+		}
+	},
+
+	getMapStyle() {
+		ee.emit('setMapStyle', this.mapStyle.name);
+		ee.emit('getMapStyle');
+	},
+
+	getMapStyleActive(mapStyle) {
+		this.mapStyle = mapStyle;
 	},
 
 	setMapStyle() {
 		this.getMapStyle();
+
+		if (this.mapStyle.name === this.mapStyles.satellite.name) {
+			this.map.removeLayer(this.hillshade.id);
+		}
+
 		this.map.setStyle(this.mapStyle.url);
+		/* add hillshading, layer styles and active markers after 1.2 sec delay to set map style */
+		setTimeout(() => {
+			if (this.mapStyle.name === this.mapStyles.outdoors.name) {
+				this.addHillShading();
+			}
 
-		/* add hillshading and layer styles after 1 sec delay to set map style */
-		// setTimeout(() => {
-		// 	if (this.mapStyle.name === mapStyles.state.mapStyles.outdoors.name) {
-		// 		this.addHillShading();
-		// 	}
+			heatmapService.addHeatmap();
 
-		// 	layerStyles.state.layerStyles.map((layerStyle) => {
-		// 		this.addLayerStyle(layerStyle);
+			if (!heatmapService.heatmap.props.active) {
+				this.map.setLayoutProperty(heatmapService.heatmap.id, 'visibility', 'none');
+			}
 
-		// 		if (layerStyle.layout.visibility === 'visible') {
-		// 			this.map.setLayoutProperty(layerStyle.id, 'visibility', 'visible');
-		// 		}
+			layerStylesService.layerStyles.map((layerStyle) => {
+				this.addLayerStyle(layerStyle);
 
-		// 		return true;
-		// 	});
-		// }, 1000);
+				if (layerStyle.layout.visibility === 'visible') {
+					this.map.setLayoutProperty(layerStyle.id, 'visibility', 'visible');
+				}
+				return true;
+			});
+			markerDisplayService.showMarkers();
+		}, 1200);
 	},
 };

@@ -1,9 +1,10 @@
 <template>
-	<div :class='[splashScreen.class, {active: splashScreen.active}]'></div>
+	<div :class='[splashScreen.class, { active: splashScreen.active }]'></div>
 </template>
 
 <script>
-import { mapGetters } from 'nuxt';
+/* eslint-disable-next-line import/no-extraneous-dependencies */
+import { mapGetters } from 'vuex';
 
 export default {
 	name: 'SplashScreen',

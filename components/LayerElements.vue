@@ -1,11 +1,12 @@
 <template>
 	<li>
-		<div :class='[el.class, {active: el.active}]' @click='selectLayer'>{{ el.name }}</div>
+		<div :class='[el.class, { active: el.active }]' @click='selectLayer'>{{ el.name }}</div>
 	</li>
 </template>
 
 <script>
-import { mapActions } from 'nuxt';
+/* eslint-disable-next-line import/no-extraneous-dependencies */
+import { mapActions } from 'vuex';
 
 export default {
 	name: 'LayerElements',
@@ -33,17 +34,16 @@ $primary-text-color: rgb(60,75,90);
 
 div ul.layers li {
 	&:first-child div {
-		@include border-radius(3px 3px 0 0);
+		@include border-radius(4px 4px 0 0);
 	}
 
 	&:last-child div {
-		@include border-radius(0 0 3px 3px);
+		@include border-radius(0 0 4px 4px);
 		border-bottom-width: 1px;
 	}
 
 	div {
-		display: block;
-		padding: 5px 0 5px 40px;
+		padding: 7px 0 6px 40px;
 		background: $primary-background-color;
 		border: 1px solid rgb(187,187,187);
 		border-bottom-width: 0;
@@ -51,8 +51,8 @@ div ul.layers li {
 		cursor: pointer;
 		font-family: 'Roboto', sans-serif;
 		font-size: 0.95em;
-		text-decoration: none;
-		width: 95px;
+		line-height: 1.1;
+		width: 85px;
 
 		&:hover {
 			background: $hover-background-color;

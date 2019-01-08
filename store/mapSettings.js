@@ -1,30 +1,29 @@
-import config from '../config/client';
-import events from '../events';
+import config from '../config/client/config.json';
+import ee from '../events';
 
 const state = () => ({
 	mapSettings: config.map.settings,
 });
 
 const mutations = {
-	SET_MAP_SETTINGS(state, mapSettings) {
+	setSettings(state, mapSettings) {
 		state.mapSettings = mapSettings;
 	},
 };
 
 const actions = {
-	getMapSettings() {
-		events.mapSettings.mapSettings.emit('mapSettings', state.map);
+	getSettings({ rootState }) {
+		ee.emit('mapSettings', rootState.mapSettings.mapSettings);
 	},
-	setMapSettings({ commit }, mapSettings) {
-		commit('SET_MAP_SETTINGS', mapSettings);
+	setSettings({ commit }, mapSettings) {
+		commit('setSettings', mapSettings);
 	},
 };
 
-const MapModule = {
-	namespaced: true,
-	state,
+const mapSettings = {
 	actions,
 	mutations,
+	state,
 };
 
-export default MapModule;
+export default mapSettings;

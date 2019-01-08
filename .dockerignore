@@ -1,2 +1,9 @@
+.eslintrc.js
+.git*
+.nuxt
 .vscode
+docker-compose.yml
+Dockerfile
 node_modules
+README.md
+package-lock.json

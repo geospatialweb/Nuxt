@@ -1,28 +1,18 @@
-// import { Axios } from 'axios-observable';
-// import config from '../config/client';
-import events from '../events';
+import { Axios } from 'axios-observable';
+import config from '../config/client/config.json';
+import ee from '../events';
 
 const state = () => ({
 	layerStyles: [],
-	layerStylesHash: {},
 });
 
 const mutations = {
-	CREATE_LAYERSTYLES_HASH(state) {
-		state.layerStyles.map((layerStyle, i) => {
-			state.layerStylesHash[layerStyle.id] = i;
-			return true;
-		});
-	},
-	LOAD_LAYERSTYLE(state, layerStyle) {
+	loadLayerStyle(state, layerStyle) {
 		state.layerStyles.push(layerStyle);
-		events.layers.addLayerStyle.emit('addLayerStyle', layerStyle);
 	},
-	SET_LAYERSTYLE_ACTIVE(state, name) {
-		const i = state.layerStylesHash[name];
-
+	setActive(state, name) {
+		const i = state.layerStyles.findIndex(obj => obj.id === name);
 		state.layerStyles[i].active = !state.layerStyles[i].active;
-
 		state.layerStyles[i].active ?
 			state.layerStyles[i].layout.visibility = 'visible' :
 			state.layerStyles[i].layout.visibility = 'none';
@@ -30,18 +20,55 @@ const mutations = {
 };
 
 const actions = {
-	getLayerStyles() {
+	addLayerStyles(layerStyles) {
+		layerStyles.map(layerStyle => ee.emit('addLayerStyle', layerStyle));
+		actions.setLayerStyles(layerStyles);
 	},
-	setLayerStyleActive({ commit }, name) {
-		commit('SET_LAYERSTYLE_ACTIVE', name);
+	loadLayerStyles({ commit }) {
+		const { layerStyles } = config;
+
+		Object.keys(layerStyles).map((key) => {
+			const params = {
+				fields: layerStyles[key].fields,
+				table: layerStyles[key].layer.id,
+			};
+
+			const subscription = Axios.get('/api/geojson', { params })
+				.subscribe((res) => {
+					if (res.data) {
+						const layerStyle = layerStyles[key].layer;
+						layerStyle.source.data = res.data;
+
+						commit('loadLayerStyle', layerStyle);
+					} else {
+						console.error('Data Error:\n', res.data);
+					}
+				},
+				(err) => {
+					console.error('Query Failed:\n', err.error);
+				},
+				() => {
+					if (this.state.layerStyles.layerStyles.length === Object.keys(layerStyles).length) {
+						actions.addLayerStyles(this.state.layerStyles.layerStyles);
+					}
+
+					subscription.unsubscribe();
+				});
+			return true;
+		});
+	},
+	setActive({ commit }, name) {
+		commit('setActive', name);
+	},
+	setLayerStyles(layerStyles) {
+		ee.emit('setLayerStyles', layerStyles);
 	},
 };
 
-const layerStylesModule = {
-	namespaced: true,
-	state,
-	mutations,
+const layerStyles = {
 	actions,
+	mutations,
+	state,
 };
 
-export default layerStylesModule;
+export default layerStyles;

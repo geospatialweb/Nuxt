@@ -4,12 +4,13 @@
 			<LayerElements v-for='layer in layers' :key='layer.class' :el='layer' @click='selectLayer' />
 		</ul>
 
-		<LayerIcons v-for='icon in icons' :key='icon.class' :icon='icon' @click='selectLayer' />
+		<LayerIcons v-for='layer in layers' :key='layer.class' :icon='layer' @click='selectLayer' />
 	</div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'nuxt';
+/* eslint-disable-next-line import/no-extraneous-dependencies */
+import { mapActions, mapGetters } from 'vuex';
 import LayerElements from './LayerElements.vue';
 import LayerIcons from './LayerIcons.vue';
 
@@ -20,7 +21,7 @@ export default {
 		LayerIcons,
 	},
 	computed: {
-		...mapGetters({ icons: 'layers/icons', layers: 'layers/layers' }),
+		...mapGetters({ layers: 'layers/layers' }),
 	},
 	methods: {
 		...mapActions({ selectLayer: 'layers/selectLayer' }),
@@ -32,9 +33,6 @@ export default {
 div {
 	ul.layers {
 		position: absolute;
-		margin: 0;
-		padding: 0;
-		list-style-type: none;
 		left: 10px;
 		top: 120px;
 	}

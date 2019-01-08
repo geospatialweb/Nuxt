@@ -1,9 +1,5 @@
 FROM node:dubnium-alpine
-
 WORKDIR /usr/src/app
-
-COPY package*.json ./
-
-RUN yarn
-
+COPY package.json ./
+RUN npm install
 COPY . .

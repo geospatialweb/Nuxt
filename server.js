@@ -17,13 +17,12 @@ express()
 	}))
 
 	.set('env', process.env.NODE_ENV)
-	.set('host', process.env.HOST)
+	.set('host', process.env.HOST || '0.0.0.0')
 	.set('port', process.env.PORT || 80)
 
 	.listen(process.env.PORT, process.env.HOST, (err) => {
 		err ?
 			console.error('Server Failed:\n', err) :
-
 			console.log(`Active on http://localhost:${process.env.PORT} at ` +
                 `${new Date().toDateString()} ${new Date().toTimeString()}`);
 	});
