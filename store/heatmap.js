@@ -22,7 +22,7 @@ const mutations = {
 		state.heatmap.active = !state.heatmap.active;
 		this.dispatch('heatmap/heatmapActive');
 	},
-	setParams(state, { param, value }) {
+	setParams(state, [param, value]) {
 		state.heatmap[param] = value;
 	},
 };
@@ -37,8 +37,8 @@ const actions = {
 	setActive({ commit }) {
 		commit('setActive');
 	},
-	setParams({ commit }, { param, value }) {
-		commit('setParams', { param, value });
+	setParams({ commit }, [param, value]) {
+		commit('setParams', [param, value]);
 	},
 };
 

@@ -11,7 +11,7 @@
 			"src": "https://github.com/geospatialweb/Nuxt.git"
 		},
 		"title": {
-			"name" : "Node | Express | Vue | Nuxt | Vuex | Mapbox GL | Deck.GL | PostGIS | Docker"
+			"name" : "Node | Express | Vue | Vuex | RxJS | Nuxt | Mapbox GL | Deck.GL | PostGIS | Docker"
 		}
 	},
 	"heatmap": {
