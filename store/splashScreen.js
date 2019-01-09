@@ -8,7 +8,7 @@ const state = () => ({
 const mutations = {
 	setActive(state) {
 		state.splashScreen.active = !state.splashScreen.active;
-		this.dispatch('splashScreen/splashScreenActive');
+		this.dispatch('splashScreen/setSplashScreenActive');
 	},
 };
 
@@ -16,8 +16,8 @@ const actions = {
 	setActive({ commit }) {
 		commit('setActive');
 	},
-	splashScreenActive() {
-		ee.emit('splashScreenActive');
+	setSplashScreenActive() {
+		ee.emit('setSplashScreenActive');
 	},
 };
 

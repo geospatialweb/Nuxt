@@ -27,7 +27,7 @@ const mutations = {
 };
 
 const actions = {
-	loadMarkers({ commit }) {
+	loadMarkers({ commit, state }) {
 		const { markers } = config;
 
 		Object.keys(markers).map((key) => {
@@ -46,9 +46,9 @@ const actions = {
 					console.error('Query Failed:\n', err.error);
 				},
 				() => {
-					if (this.state.markers.markers.length === Object.keys(markers).length) {
+					if (state.markers.length === Object.keys(markers).length) {
 						commit('createMarkersHash');
-						actions.setMarkers(this.state.markers.markers, this.state.markers.markersHash);
+						actions.setMarkers(state.markers, state.markersHash);
 					}
 					subscription.unsubscribe();
 				});

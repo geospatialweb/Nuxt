@@ -24,7 +24,7 @@ const actions = {
 		layerStyles.map(layerStyle => ee.emit('addLayerStyle', layerStyle));
 		actions.setLayerStyles(layerStyles);
 	},
-	loadLayerStyles({ commit }) {
+	loadLayerStyles({ commit, state }) {
 		const { layerStyles } = config;
 
 		Object.keys(layerStyles).map((key) => {
@@ -48,8 +48,8 @@ const actions = {
 					console.error('Query Failed:\n', err.error);
 				},
 				() => {
-					if (this.state.layerStyles.layerStyles.length === Object.keys(layerStyles).length) {
-						actions.addLayerStyles(this.state.layerStyles.layerStyles);
+					if (state.layerStyles.length === Object.keys(layerStyles).length) {
+						actions.addLayerStyles(state.layerStyles);
 					}
 
 					subscription.unsubscribe();

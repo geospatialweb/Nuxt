@@ -12,8 +12,8 @@ const mutations = {
 };
 
 const actions = {
-	getSettings({ rootState }) {
-		ee.emit('mapSettings', rootState.mapSettings.mapSettings);
+	getSettings({ state }) {
+		ee.emit('mapSettings', state.mapSettings);
 	},
 	setSettings({ commit }, mapSettings) {
 		commit('setSettings', mapSettings);

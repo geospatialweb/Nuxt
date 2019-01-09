@@ -29,8 +29,8 @@ const actions = {
 		commit('loadTrails', config.trails);
 	},
 
-	selectTrail(context, event) {
-		ee.emit('selectTrail', event, context.state.trails);
+	selectTrail({ state }, event) {
+		ee.emit('selectTrail', event, state.trails);
 	},
 
 	setActive({ commit }, i) {

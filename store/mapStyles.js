@@ -12,17 +12,16 @@ const mutations = {
 };
 
 const actions = {
-	getStyle() {
-		const mapStyle = Object.keys(this.state.mapStyles.mapStyles)
-			.find(key => this.state.mapStyles.mapStyles[key].active);
-		ee.emit('mapStyleActive', this.state.mapStyles.mapStyles[mapStyle]);
+	getStyle({ state }) {
+		const mapStyle = Object.keys(state.mapStyles).find(key => state.mapStyles[key].active);
+		ee.emit('mapStyle', state.mapStyles[mapStyle]);
 	},
-	setStyle({ commit }, name) {
+	setStyle({ commit, state }, name) {
 		commit('setActive', name);
 		let mapStyleName;
-		name === this.state.mapStyles.mapStyles.outdoors.name ?
-			mapStyleName = this.state.mapStyles.mapStyles.satellite.name :
-			mapStyleName = this.state.mapStyles.mapStyles.outdoors.name;
+		name === state.mapStyles.outdoors.name ?
+			mapStyleName = state.mapStyles.satellite.name :
+			mapStyleName = state.mapStyles.outdoors.name;
 		commit('setActive', mapStyleName);
 	},
 };

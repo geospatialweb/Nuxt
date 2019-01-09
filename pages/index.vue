@@ -39,6 +39,7 @@ export default {
 	mounted() {
 		/* eslint-disable-next-line global-require */
 		require('../services/events').default.setEvents();
+		/* ./services/map/loadMap() */
 		ee.emit('loadMap');
 	},
 };

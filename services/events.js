@@ -13,12 +13,18 @@ export default {
 		ee.on('selectLayer', (event, state) => layersService.selectLayer(event, state));
 		ee.on('setLayerStyles', layerStyles => layerStylesService.setLayerStyles(layerStyles));
 		ee.on('addLayerStyle', layerStyle => mapService.addLayerStyle(layerStyle));
-		ee.on('mapSettings', settings => mapService.getMapSettings(settings));
-		ee.on('mapStyleActive', mapStyle => mapService.getMapStyleActive(mapStyle));
 		ee.on('loadMap', () => mapService.loadMap());
+		ee.on('mapSettings', (mapSettings) => {
+			mapService.mapSettings = mapSettings;
+			return true;
+		});
+		ee.on('mapStyle', (mapStyle) => {
+			mapService.mapStyle = mapStyle;
+			return true;
+		});
 		ee.on('setMarker', (marker, data) => markersService.setMarker(marker, data));
 		ee.on('setMarkers', (markers, markersHash) => markersService.setMarkers(markers, markersHash));
-		ee.on('splashScreenActive', () => splashScreenService.setActive());
+		ee.on('setSplashScreenActive', () => splashScreenService.setActive());
 		ee.on('selectTrail', (event, state) => trailsService.selectTrail(event, state));
 	},
 };

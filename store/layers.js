@@ -12,8 +12,8 @@ const mutations = {
 };
 
 const actions = {
-	selectLayer(context, event) {
-		ee.emit('selectLayer', event, context.state.layers);
+	selectLayer({ state }, event) {
+		ee.emit('selectLayer', event, state.layers);
 	},
 
 	setActive({ commit }, i) {

@@ -139,14 +139,15 @@ export default {
 		}
 	},
 
+	getMapStyle() {
+		ee.emit('setMapStyle', this.mapStyle.name);
+		ee.emit('getMapStyle');
+	},
+
 	setLayerStyleVisibility(layer) {
 		layer.active ?
 			this.map.setLayoutProperty(layer.class, 'visibility', 'visible') :
 			this.map.setLayoutProperty(layer.class, 'visibility', 'none');
-	},
-
-	getMapSettings(settings) {
-		this.mapSettings = settings;
 	},
 
 	setMapSettings() {
@@ -164,15 +165,6 @@ export default {
 			settings.bounds._sw.lng !== this.mapSettings.bounds._sw.lng) {
 			ee.emit('setMapSettings', settings);
 		}
-	},
-
-	getMapStyle() {
-		ee.emit('setMapStyle', this.mapStyle.name);
-		ee.emit('getMapStyle');
-	},
-
-	getMapStyleActive(mapStyle) {
-		this.mapStyle = mapStyle;
 	},
 
 	setMapStyle() {
