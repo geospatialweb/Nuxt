@@ -145,7 +145,7 @@
 			"width": "18"
 		},
 		{
-			"name": "Deck GL",
+			"name": "Deck.GL",
 			"active": false,
 			"class": "heatmap",
 			"icon": "uber-icon",

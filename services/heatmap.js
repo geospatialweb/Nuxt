@@ -20,13 +20,12 @@ export default {
 		ee.emit('setHeatmapActive');
 	},
 	heatmapActive() {
-		this.heatmap.props.active = !this.heatmap.props.active;
+		this.heatmap.active = !this.heatmap.active;
 	},
 	loadHeatmap() {
 		this.heatmap = new MapboxLayer({
 			type: HexagonLayer,
 			id: config.heatmap.id,
-			active: config.heatmap.active,
 			colorRange: config.heatmap.colour_range,
 			coverage: Number(config.heatmap.coverage),
 			data: d3.csv(config.heatmap.data_url),
@@ -39,6 +38,7 @@ export default {
 			upperPercentile: Number(config.heatmap.upperPercentile),
 		});
 
+		this.heatmap.active = config.heatmap.active;
 		this.addHeatmap();
 		this.params.map((param) => {
 			document.getElementById(param).oninput = (event) => {

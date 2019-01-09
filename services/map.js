@@ -3,7 +3,6 @@ import config from '../config/client/config.json';
 import dataService from './data';
 import ee from '../events';
 import heatmapService from './heatmap';
-import layersService from './layers';
 import layerStylesService from './layerStyles';
 import markerDisplayService from './markerDisplay';
 import markersService from './markers';
@@ -62,20 +61,19 @@ export default {
 
 		this.map.addLayer(layerStyle, index);
 
-		if (heatmapService.heatmap && !heatmapService.heatmap.props.active &&
+		if (heatmapService.heatmap && !heatmapService.heatmap.active &&
 				layerStyle.id === heatmapService.heatmap.id) {
 			this.map.setLayoutProperty(layerStyle.id, 'visibility', 'none');
 		}
 	},
 
 	displayHeatmap() {
-		const i = this.layers.findIndex(obj => obj.class === this.mapStyles.satellite.name);
-		heatmapService.heatmap.props.active ?
-			this.showHeatmap(i) :
-			this.hideHeatmap(i);
+		heatmapService.heatmap.active ?
+			this.showHeatmap() :
+			this.hideHeatmap();
 	},
 
-	showHeatmap(i) {
+	showHeatmap() {
 		ee.emit('setTrailsDisabled');
 		ee.emit('getMapSettings');
 
@@ -90,58 +88,19 @@ export default {
 		this.map.setPitch(this.heatmapSettings.pitch);
 		this.map.setZoom(this.heatmapSettings.zoom);
 
-		if (this.mapStyle.name === this.mapStyles.outdoors.name) {
-			ee.emit('setLayerActive', i);
-			layersService.setLayer(this.layers[i].class, i);
-		} else {
-			this.map.setLayoutProperty(heatmapService.heatmap.id, 'visibility', 'visible');
-		}
+		this.map.setLayoutProperty(heatmapService.heatmap.id, 'visibility', 'visible');
 	},
 
-	hideHeatmap(i) {
+	hideHeatmap() {
 		ee.emit('setTrailsDisabled');
 		heatmapService.reInitializeHeatmapParams();
 
 		this.map.setBearing(this.map.bearing);
 		this.map.setCenter(this.map.center);
-		this.map.setLayoutProperty(heatmapService.heatmap.id, 'visibility', 'none');
 		this.map.setPitch(this.map.pitch);
 		this.map.setZoom(this.map.zoom);
 
-		layerStylesService.layerStyles.map((layerStyle) => {
-			if (layerStyle.layout.visibility === 'visible') {
-				this.map.setLayoutProperty(layerStyle.id, 'visibility', 'none');
-			}
-			return true;
-		});
-
-		if (this.mapStyle.name !== this.map.mapStyle.name) {
-			ee.emit('setLayerActive', i);
-			layersService.setLayer(this.layers[i].class, i);
-		} else if (this.map.mapStyle.name === this.mapStyles.outdoors.name) {
-			markerDisplayService.hideMarkers();
-			setTimeout(() => {
-				layerStylesService.layerStyles.map((layerStyle) => {
-					if (layerStyle.layout.visibility === 'visible') {
-						this.map.setLayoutProperty(layerStyle.id, 'visibility', 'visible');
-					}
-					return true;
-				});
-				markerDisplayService.showMarkers();
-			}, 1200);
-		} else if (this.map.mapStyle.name === this.mapStyles.satellite.name) {
-			layerStylesService.layerStyles.map((layerStyle) => {
-				if (layerStyle.layout.visibility === 'visible') {
-					this.map.setLayoutProperty(layerStyle.id, 'visibility', 'visible');
-				}
-				return true;
-			});
-		}
-	},
-
-	getMapStyle() {
-		ee.emit('setMapStyle', this.mapStyle.name);
-		ee.emit('getMapStyle');
+		this.map.setLayoutProperty(heatmapService.heatmap.id, 'visibility', 'none');
 	},
 
 	setLayerStyleVisibility(layer) {
@@ -167,6 +126,11 @@ export default {
 		}
 	},
 
+	getMapStyle() {
+		ee.emit('setMapStyle', this.mapStyle.name);
+		ee.emit('getMapStyle');
+	},
+
 	setMapStyle() {
 		this.getMapStyle();
 
@@ -183,7 +147,7 @@ export default {
 
 			heatmapService.addHeatmap();
 
-			if (!heatmapService.heatmap.props.active) {
+			if (!heatmapService.heatmap.active) {
 				this.map.setLayoutProperty(heatmapService.heatmap.id, 'visibility', 'none');
 			}
 
@@ -195,6 +159,7 @@ export default {
 				}
 				return true;
 			});
+
 			markerDisplayService.showMarkers();
 		}, 1200);
 	},
