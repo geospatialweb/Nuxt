@@ -28,7 +28,7 @@ module.exports = {
 		'operator-linebreak': ['error', 'before',
 			{
 				overrides: {
-					'+': 'after', '?': 'after', ':': 'after', '&&': 'after', '||': 'after',
+					'=': 'after', '+': 'after', '?': 'after', ':': 'after', '&&': 'after', '||': 'after',
 				},
 			}],
 	},
